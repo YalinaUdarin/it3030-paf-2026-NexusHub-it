@@ -1,7 +1,7 @@
 # Smart Campus Operations Hub
 ### IT3030 – Programming Applications & Frameworks | Group 104 | SLIIT
 
-A full-stack web platform to manage campus facility bookings and maintenance incidents.
+A full-stack web platform to manage campus facility bookings and maintenance incidents..........
 
 **Stack:** Spring Boot 3 · MongoDB Atlas · React 18 · Vite · Tailwind CSS · Google OAuth 2.0 · JWT · GitHub Actions
 
