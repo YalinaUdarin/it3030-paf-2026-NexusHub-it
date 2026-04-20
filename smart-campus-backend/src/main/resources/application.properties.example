@@ -1,15 +1,14 @@
 # Server
 server.port=8080
 
-# MongoDB Atlas — replace with your connection string
-spring.data.mongodb.uri=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/smart_campus?retryWrites=true&w=majority
+# MongoDB Atlas
+spring.data.mongodb.uri=YOUR_MONGODB_URI
 spring.data.mongodb.database=smart_campus
-
 # JWT
 app.jwt.secret=${JWT_SECRET:your-super-secret-jwt-key-change-this-in-production-min-256-bits}
 app.jwt.expiration=86400000
 
-# OAuth2 Google — replace with your credentials from Google Cloud Console
+# OAuth2 Google
 spring.security.oauth2.client.registration.google.client-id=YOUR_GOOGLE_CLIENT_ID
 spring.security.oauth2.client.registration.google.client-secret=YOUR_GOOGLE_CLIENT_SECRET
 spring.security.oauth2.client.registration.google.scope=email,profile
