@@ -1,0 +1,68 @@
+# ===========================
+# Maven build output
+# ===========================
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# ===========================
+# Credentials & Secrets
+# ===========================
+src/main/resources/application.properties
+src/main/resources/application-*.properties
+src/main/resources/application.yml
+src/main/resources/application-*.yml
+*.env
+.env
+
+# ===========================
+# Uploaded files
+# ===========================
+uploads/
+
+# ===========================
+# IDE — IntelliJ IDEA
+# ===========================
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# IDE — Eclipse / STS
+.classpath
+.project
+.settings/
+.springBeans
+.sts4-cache/
+
+# IDE — VS Code
+.vscode/
+
+# IDE — NetBeans
+nbproject/private/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+# ===========================
+# OS generated files
+# ===========================
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ===========================
+# Logs
+# ===========================
+*.log
+logs/
+spring.log
+
+# ===========================
+# Maven wrapper (keep jar, ignore exec)
+# ===========================
+.mvn/wrapper/maven-wrapper.properties

@@ -1,0 +1,4 @@
+smart-campus-frontend/node_modules/
+smart-campus-backend/target/
+smart-campus-backend/uploads/
+.env
