@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { bookingApi } from '../../api'
 import StatusBadge from '../../components/StatusBadge'
 import toast from 'react-hot-toast'
-import { HiCheck, HiX } from 'react-icons/hi'
+import { HiCheck, HiX, HiTrash } from 'react-icons/hi'
 
 const STATUSES = ['', 'PENDING', 'APPROVED', 'REJECTED', 'CANCELLED']
 
@@ -45,6 +45,16 @@ export default function AdminBookings() {
     finally { setSubmitting(false) }
   }
 
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to permanently delete this booking?')) {
+      try {
+        await bookingApi.delete(id)
+        toast.success('Booking deleted successfully')
+        fetchBookings()
+      } catch (err) { toast.error(err.response?.data?.message || 'Failed') }
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -70,14 +80,14 @@ export default function AdminBookings() {
           <table className="w-full text-sm">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                {['Resource', 'Requested By', 'Date & Time', 'Purpose', 'Attendees', 'Status', 'Actions'].map(h => (
+                {['Resource', 'Requested By', 'Date & Time', 'Purpose', 'Attendees', 'Status', 'Actions', 'Delete'].map(h => (
                   <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {bookings.length === 0 ? (
-                <tr><td colSpan={7} className="text-center py-8 text-gray-500">No bookings found</td></tr>
+                <tr><td colSpan={8} className="text-center py-8 text-gray-500">No bookings found</td></tr>
               ) : bookings.map(b => (
                 <tr key={b.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-4 py-3 font-medium text-gray-900">{b.resourceName}</td>
@@ -105,6 +115,12 @@ export default function AdminBookings() {
                         </button>
                       </div>
                     )}
+                  </td>
+                  <td className="px-4 py-3">
+                    <button onClick={() => handleDelete(b.id)}
+                            className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete">
+                      <HiTrash className="text-lg" />
+                    </button>
                   </td>
                 </tr>
               ))}

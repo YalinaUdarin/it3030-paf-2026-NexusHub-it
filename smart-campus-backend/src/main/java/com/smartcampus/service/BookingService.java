@@ -128,4 +128,15 @@ public class BookingService {
         notificationService.notifyBookingCancelled(booking.getUserId(), bookingId, booking.getResourceName());
         return saved;
     }
+
+    public void deleteBooking(String bookingId, String userId, boolean isAdmin) {
+        Booking booking = getBookingById(bookingId);
+
+        if (!isAdmin && !booking.getUserId().equals(userId)) {
+            throw new AccessDeniedException("You can only delete your own bookings");
+        }
+
+        bookingRepository.deleteById(bookingId);
+        log.info("Booking {} deleted by user {}", bookingId, userId);
+    }
 }
