@@ -1,19 +1,14 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { bookingApi } from '../api';
-import StatusBadge from '../components/StatusBadge';
-import toast from 'react-hot-toast';
+import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { bookingApi } from '../api'
+import StatusBadge from '../components/StatusBadge'
+import toast from 'react-hot-toast'
 import {
-  HiCalendar,
-  HiClock,
-  HiUsers,
-  HiBookmark,
-  HiXCircle,
-  HiPlus,
-  HiOfficeBuilding,
-} from 'react-icons/hi';
+  HiCalendar, HiClock, HiUsers, HiBookmark,
+  HiXCircle, HiPlus, HiOfficeBuilding
+} from 'react-icons/hi'
 
-const STATUSES = ['', 'PENDING', 'APPROVED', 'REJECTED', 'CANCELLED'];
+const STATUSES = ['', 'PENDING', 'APPROVED', 'REJECTED', 'CANCELLED']
 
 const statusConfig = {
   '': { label: 'All', color: '' },
@@ -21,52 +16,43 @@ const statusConfig = {
   APPROVED: { label: 'Approved', color: 'bg-emerald-500' },
   REJECTED: { label: 'Rejected', color: 'bg-red-500' },
   CANCELLED: { label: 'Cancelled', color: 'bg-slate-400' },
-};
+}
 
 export default function BookingsPage() {
-  const [bookings, setBookings] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('');
+  const [bookings, setBookings] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [filter, setFilter] = useState('')
 
-  useEffect(() => {
-    fetchBookings();
-  }, [filter]);
+  useEffect(() => { fetchBookings() }, [filter])
 
   const fetchBookings = async () => {
-    setLoading(true);
+    setLoading(true)
     try {
-      const { data } = await bookingApi.getAll({ status: filter || undefined });
-      setBookings(data);
-    } finally {
-      setLoading(false);
-    }
-  };
+      const { data } = await bookingApi.getAll({ status: filter || undefined })
+      setBookings(data)
+    } finally { setLoading(false) }
+  }
 
   const handleCancel = async (id) => {
-    if (!confirm('Cancel this booking?')) return;
+    if (!confirm('Cancel this booking?')) return
     try {
-      await bookingApi.cancel(id);
-      toast.success('Booking cancelled');
-      fetchBookings();
+      await bookingApi.cancel(id)
+      toast.success('Booking cancelled')
+      fetchBookings()
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to cancel');
+      toast.error(err.response?.data?.message || 'Failed to cancel')
     }
-  };
+  }
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2
-            className="text-2xl font-extrabold text-slate-900"
-            style={{ letterSpacing: '-0.02em' }}
-          >
+          <h2 className="text-2xl font-extrabold text-slate-900" style={{ letterSpacing: '-0.02em' }}>
             My Bookings
           </h2>
-          <p className="text-slate-500 mt-1 text-sm">
-            Track and manage your resource bookings
-          </p>
+          <p className="text-slate-500 mt-1 text-sm">Track and manage your resource bookings</p>
         </div>
         <Link to="/resources" className="btn-primary flex items-center gap-2">
           <HiPlus /> New Booking
@@ -75,25 +61,16 @@ export default function BookingsPage() {
 
       {/* Status filter pills */}
       <div className="flex gap-2 flex-wrap">
-        {STATUSES.map((s) => (
-          <button
-            key={s}
-            onClick={() => setFilter(s)}
-            className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 ${
-              filter === s
-                ? 'text-white shadow-sm'
-                : 'bg-white text-slate-500 border border-slate-200 hover:border-teal-300 hover:text-teal-600'
-            }`}
-            style={
-              filter === s
-                ? { background: 'linear-gradient(135deg, #0d9488, #0891b2)' }
-                : {}
-            }
-          >
+        {STATUSES.map(s => (
+          <button key={s} onClick={() => setFilter(s)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                    filter === s
+                      ? 'text-white shadow-sm'
+                      : 'bg-white text-slate-500 border border-slate-200 hover:border-teal-300 hover:text-teal-600'
+                  }`}
+                  style={filter === s ? { background: 'linear-gradient(135deg, #0d9488, #0891b2)' } : {}}>
             {s && filter !== s && (
-              <span
-                className={`w-1.5 h-1.5 rounded-full ${statusConfig[s]?.color}`}
-              />
+              <span className={`w-1.5 h-1.5 rounded-full ${statusConfig[s]?.color}`} />
             )}
             {statusConfig[s]?.label || 'All'}
           </button>
@@ -102,7 +79,7 @@ export default function BookingsPage() {
 
       {loading ? (
         <div className="flex items-center justify-center h-48">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-teal-500" />
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-teal-500"/>
         </div>
       ) : bookings.length === 0 ? (
         <div className="card text-center py-16">
@@ -110,23 +87,15 @@ export default function BookingsPage() {
             <HiCalendar className="text-3xl text-slate-400" />
           </div>
           <p className="font-semibold text-slate-600">No bookings found</p>
-          <p className="text-sm text-slate-400 mt-1">
-            Make your first booking by browsing resources
-          </p>
-          <Link
-            to="/resources"
-            className="btn-primary mt-4 inline-flex items-center gap-2"
-          >
+          <p className="text-sm text-slate-400 mt-1">Make your first booking by browsing resources</p>
+          <Link to="/resources" className="btn-primary mt-4 inline-flex items-center gap-2">
             <HiOfficeBuilding /> Browse Resources
           </Link>
         </div>
       ) : (
         <div className="space-y-3">
-          {bookings.map((b) => (
-            <div
-              key={b.id}
-              className="card flex items-center justify-between hover:shadow-md transition-all group"
-            >
+          {bookings.map(b => (
+            <div key={b.id} className="card flex items-center justify-between hover:shadow-md transition-all group">
               <div className="flex items-center gap-4 flex-1 min-w-0">
                 {/* Icon */}
                 <div className="w-12 h-12 rounded-2xl bg-teal-50 flex items-center justify-center flex-shrink-0">
@@ -173,17 +142,12 @@ export default function BookingsPage() {
 
               {/* Actions */}
               <div className="flex items-center gap-2 ml-4 flex-shrink-0">
-                <Link
-                  to={`/bookings/${b.id}`}
-                  className="btn-secondary text-xs px-3 py-1.5"
-                >
+                <Link to={`/bookings/${b.id}`} className="btn-secondary text-xs px-3 py-1.5">
                   Details
                 </Link>
                 {(b.status === 'PENDING' || b.status === 'APPROVED') && (
-                  <button
-                    onClick={() => handleCancel(b.id)}
-                    className="btn-danger text-xs px-3 py-1.5"
-                  >
+                  <button onClick={() => handleCancel(b.id)}
+                          className="btn-danger text-xs px-3 py-1.5">
                     Cancel
                   </button>
                 )}
@@ -193,5 +157,5 @@ export default function BookingsPage() {
         </div>
       )}
     </div>
-  );
+  )
 }
