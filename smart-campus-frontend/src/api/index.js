@@ -52,6 +52,7 @@ export const bookingApi = {
   approve: (id) => api.patch(`/api/bookings/${id}/approve`),
   reject: (id, reason) => api.patch(`/api/bookings/${id}/reject`, { reason }),
   cancel: (id) => api.patch(`/api/bookings/${id}/cancel`),
+  delete: (id) => api.delete(`/api/bookings/${id}`),
 }
 
 // ── Tickets ───────────────────────────────────────────

@@ -75,4 +75,14 @@ public class BookingController {
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
         return ResponseEntity.ok(bookingService.cancelBooking(id, principal.getId(), isAdmin));
     }
+
+    // DELETE /api/bookings/{id}
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteBooking(@PathVariable String id,
+                                              @AuthenticationPrincipal UserPrincipal principal) {
+        boolean isAdmin = principal.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        bookingService.deleteBooking(id, principal.getId(), isAdmin);
+        return ResponseEntity.noContent().build();
+    }
 }
