@@ -27,6 +27,7 @@ public class TicketService {
     private final NotificationService notificationService;
     private final FileStorageService fileStorageService;
 
+    //Attachment Count Validation
     public Ticket createTicket(Ticket ticket, List<MultipartFile> attachments, User currentUser) {
         if (attachments != null && attachments.size() > 3) {
             throw new BadRequestException("Maximum 3 attachments allowed");
@@ -68,6 +69,7 @@ public class TicketService {
     }
 
     public Ticket getTicketById(String id) {
+        //Ticket Not Found Validation
         return ticketRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found: " + id));
     }
@@ -86,6 +88,7 @@ public class TicketService {
             ticket.setResolutionNotes(resolutionNotes);
             ticket.setResolvedAt(LocalDateTime.now());
         }
+        //Rejection Reason Validation
         if (newStatus == Ticket.TicketStatus.REJECTED) {
             if (rejectionReason == null || rejectionReason.isBlank()) {
                 throw new BadRequestException("Rejection reason is required");
@@ -101,6 +104,7 @@ public class TicketService {
 
     public Ticket assignTicket(String ticketId, String technicianId) {
         Ticket ticket = getTicketById(ticketId);
+        //User Not Found Validation When Assigning Technician
         User technician = userRepository.findById(technicianId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + technicianId));
 
@@ -146,6 +150,7 @@ public class TicketService {
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("Comment not found: " + commentId));
 
+         //Comment Ownership Validation for Editing
         if (!comment.getAuthorId().equals(currentUser.getId())) {
             throw new AccessDeniedException("You can only edit your own comments");
         }
@@ -162,7 +167,8 @@ public class TicketService {
                 .filter(c -> c.getId().equals(commentId))
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("Comment not found: " + commentId));
-
+        
+        //Comment Ownership Validation for Deleting
         if (!isAdmin && !comment.getAuthorId().equals(currentUser.getId())) {
             throw new AccessDeniedException("You can only delete your own comments");
         }
