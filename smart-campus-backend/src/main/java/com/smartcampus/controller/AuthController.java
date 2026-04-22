@@ -120,6 +120,18 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
+    // DELETE /api/admin/users/{id}
+    @DeleteMapping("/api/admin/users/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteUser(@PathVariable String id,
+                                           @AuthenticationPrincipal UserPrincipal principal) {
+        if (principal.getUser().getId().equals(id)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        userService.deleteUser(id);
+        return ResponseEntity.noContent().build();
+    }
+
     // GET /api/admin/stats
     @GetMapping("/api/admin/stats")
     @PreAuthorize("hasRole('ADMIN')")

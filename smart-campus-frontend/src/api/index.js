@@ -86,6 +86,7 @@ export const adminApi = {
   getUsers: () => api.get('/api/admin/users'),
   updateRoles: (id, roles) => api.patch(`/api/admin/users/${id}/roles`, { roles }),
   toggleUser: (id, enabled) => api.patch(`/api/admin/users/${id}/toggle`, { enabled }),
+  deleteUser: (id) => api.delete(`/api/admin/users/${id}`),
   getStats: () => api.get('/api/admin/stats'),
 }
 
