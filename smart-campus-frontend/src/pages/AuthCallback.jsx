@@ -12,7 +12,7 @@ export default function AuthCallback() {
     const token = params.get('token')
     if (token) {
       login(token)
-      toast.success('Successfully signed in!')
+      toast.success('Successfully signed in!', { id: 'auth-signin' })
       navigate('/', { replace: true })
     } else {
       toast.error('Authentication failed. Please try again.')
