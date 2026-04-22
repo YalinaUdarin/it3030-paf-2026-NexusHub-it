@@ -36,13 +36,12 @@ export default function AdminResources() {
     setModal('edit')
   }
 
+  const wordCount = (text) => text.trim() === '' ? 0 : text.trim().split(/\s+/).length
+
   const handleSubmit = async (e) => {
     e.preventDefault()
-    const loc = form.location.trim()
-    const hasBlock = /block\s*[a-zA-Z0-9]/i.test(loc)
-    const hasFloor = /floor\s*[0-9]/i.test(loc)
-    if (!hasBlock || !hasFloor) {
-      toast.error('Location must include a block (e.g. Block A) and a floor (e.g. Floor 2)')
+    if (wordCount(form.description) < 80) {
+      toast.error('Description must be at least 80 words')
       return
     }
     setSubmitting(true)
@@ -178,18 +177,29 @@ export default function AdminResources() {
               </div>
               <div>
                 <label className="label">Location *</label>
-                <input
-                  value={form.location}
-                  onChange={e => setForm({...form, location: e.target.value})}
-                  className="input"
-                  required
-                  placeholder="e.g. Block A, Floor 2"
-                />
-                <p className="text-xs text-slate-400 mt-1">Must include a block (e.g. Block A) and a floor (e.g. Floor 2)</p>
+                <input value={form.location} onChange={e => setForm({...form, location: e.target.value})} className="input" required placeholder="e.g. Block A, Floor 2" />
               </div>
               <div>
-                <label className="label">Description</label>
-                <textarea value={form.description} onChange={e => setForm({...form, description: e.target.value})} rows={3} className="input resize-none" placeholder="Optional description..." />
+                <label className="label">Description <span className="text-red-400">*</span></label>
+                <textarea
+                  value={form.description}
+                  onChange={e => setForm({...form, description: e.target.value})}
+                  rows={4}
+                  className={`input resize-none ${
+                    form.description && wordCount(form.description) < 80
+                      ? 'border-red-300 focus:border-red-400 focus:ring-red-500/20'
+                      : ''
+                  }`}
+                  placeholder="Describe the resource in at least 80 words..."
+                />
+                <div className="flex items-center justify-between mt-1">
+                  <p className="text-xs text-slate-400">Minimum 80 words required</p>
+                  <p className={`text-xs font-semibold ${
+                    wordCount(form.description) >= 80 ? 'text-teal-600' : 'text-red-400'
+                  }`}>
+                    {wordCount(form.description)} / 80 words
+                  </p>
+                </div>
               </div>
               <div>
                 <label className="label">Status</label>
