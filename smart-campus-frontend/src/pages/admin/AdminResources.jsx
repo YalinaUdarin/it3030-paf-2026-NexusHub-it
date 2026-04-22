@@ -40,10 +40,6 @@ export default function AdminResources() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (wordCount(form.description) < 80) {
-      toast.error('Description must be at least 80 words')
-      return
-    }
     setSubmitting(true)
     try {
       if (modal === 'create') {
@@ -180,22 +176,22 @@ export default function AdminResources() {
                 <input value={form.location} onChange={e => setForm({...form, location: e.target.value})} className="input" required placeholder="e.g. Block A, Floor 2" />
               </div>
               <div>
-                <label className="label">Description <span className="text-red-400">*</span></label>
+                <label className="label">Description</label>
                 <textarea
                   value={form.description}
                   onChange={e => setForm({...form, description: e.target.value})}
                   rows={4}
                   className={`input resize-none ${
-                    form.description && wordCount(form.description) < 80
+                    form.description && wordCount(form.description) > 80
                       ? 'border-red-300 focus:border-red-400 focus:ring-red-500/20'
                       : ''
                   }`}
-                  placeholder="Describe the resource in at least 80 words..."
+                  placeholder="Optional description..."
                 />
                 <div className="flex items-center justify-between mt-1">
-                  <p className="text-xs text-slate-400">Minimum 80 words required</p>
+                  <p className="text-xs text-slate-400">Optional — max 80 words</p>
                   <p className={`text-xs font-semibold ${
-                    wordCount(form.description) >= 80 ? 'text-teal-600' : 'text-red-400'
+                    wordCount(form.description) > 80 ? 'text-red-400' : 'text-slate-400'
                   }`}>
                     {wordCount(form.description)} / 80 words
                   </p>
