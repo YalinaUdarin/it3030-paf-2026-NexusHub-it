@@ -1,7 +1,6 @@
 package com.smartcampus.controller;
 
 import com.smartcampus.model.Booking;
-import com.smartcampus.model.User;
 import com.smartcampus.security.CustomUserDetailsService.UserPrincipal;
 import com.smartcampus.service.BookingService;
 import jakarta.validation.Valid;
