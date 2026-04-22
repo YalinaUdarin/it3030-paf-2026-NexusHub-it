@@ -51,4 +51,10 @@ public class UserService {
         userRepository.save(user);
         log.info("User {} enabled status set to {}", userId, enabled);
     }
+
+    public void deleteUser(String userId) {
+        User user = getUserById(userId);
+        userRepository.delete(user);
+        log.info("Deleted user with id {}", userId);
+    }
 }

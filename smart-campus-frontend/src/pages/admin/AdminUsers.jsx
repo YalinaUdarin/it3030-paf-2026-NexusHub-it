@@ -1,18 +1,22 @@
 import { useState, useEffect } from 'react'
 import { adminApi } from '../../api'
+import { useAuth } from '../../context/AuthContext'
 import toast from 'react-hot-toast'
-import { HiX } from 'react-icons/hi'
+import { HiX, HiTrash, HiExclamationCircle } from 'react-icons/hi'
 
 const ALL_ROLES = ['USER', 'ADMIN', 'TECHNICIAN', 'MANAGER']
 const roleColor = { USER: 'bg-gray-100 text-gray-700', ADMIN: 'bg-red-100 text-red-700', TECHNICIAN: 'bg-blue-100 text-blue-700', MANAGER: 'bg-purple-100 text-purple-700' }
 
 export default function AdminUsers() {
+  const { user: currentUser } = useAuth()
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
   const [roleModal, setRoleModal] = useState(null)
   const [selectedRoles, setSelectedRoles] = useState([])
   const [submitting, setSubmitting] = useState(false)
   const [search, setSearch] = useState('')
+  const [deleteModal, setDeleteModal] = useState(null)   // holds the user to delete
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => { fetchUsers() }, [])
 
@@ -53,6 +57,23 @@ export default function AdminUsers() {
       toast.success(`User ${user.enabled ? 'disabled' : 'enabled'}`)
       fetchUsers()
     } catch { toast.error('Failed to update user') }
+  }
+
+  const handleDeleteUser = async () => {
+    if (!deleteModal) return
+    setDeleting(true)
+    try {
+      await adminApi.deleteUser(deleteModal.id)
+      toast.success(`${deleteModal.name} has been deleted`)
+      setDeleteModal(null)
+      fetchUsers()
+    } catch (err) {
+      if (err.response?.status === 403) {
+        toast.error('You cannot delete your own account')
+      } else {
+        toast.error(err.response?.data?.message || 'Failed to delete user')
+      }
+    } finally { setDeleting(false) }
   }
 
   const filtered = users.filter(u =>
@@ -114,14 +135,23 @@ export default function AdminUsers() {
                     {u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '—'}
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 items-center">
                       <button onClick={() => openRoleModal(u)}
                               className="text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 px-2.5 py-1.5 rounded-lg font-medium transition-colors">
                         Edit Roles
                       </button>
                       <button onClick={() => handleToggleEnabled(u)}
-                              className={`text-xs px-2.5 py-1.5 rounded-lg font-medium transition-colors ${u.enabled ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-green-50 text-green-600 hover:bg-green-100'}`}>
+                              className={`text-xs px-2.5 py-1.5 rounded-lg font-medium transition-colors ${u.enabled ? 'bg-orange-50 text-orange-600 hover:bg-orange-100' : 'bg-green-50 text-green-600 hover:bg-green-100'}`}>
                         {u.enabled ? 'Disable' : 'Enable'}
+                      </button>
+                      <button
+                        onClick={() => setDeleteModal(u)}
+                        disabled={currentUser?.id === u.id}
+                        title={currentUser?.id === u.id ? 'Cannot delete your own account' : 'Delete user'}
+                        className="text-xs bg-red-50 text-red-600 hover:bg-red-100 px-2.5 py-1.5 rounded-lg font-medium transition-colors flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-red-50"
+                      >
+                        <HiTrash className="text-sm" />
+                        Delete
                       </button>
                     </div>
                   </td>
@@ -167,6 +197,68 @@ export default function AdminUsers() {
               <button onClick={() => setRoleModal(null)} className="btn-secondary flex-1">Cancel</button>
               <button onClick={handleSaveRoles} disabled={submitting} className="btn-primary flex-1">
                 {submitting ? 'Saving...' : 'Save Roles'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete confirmation modal */}
+      {deleteModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-gray-900">Delete User</h3>
+              <button onClick={() => setDeleteModal(null)} disabled={deleting} className="text-gray-400 hover:text-gray-600">
+                <HiX className="text-xl"/>
+              </button>
+            </div>
+
+            {/* Warning icon + message */}
+            <div className="flex flex-col items-center text-center mb-6">
+              <div className="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center mb-3">
+                <HiExclamationCircle className="text-red-600 text-3xl" />
+              </div>
+              <p className="text-gray-700 font-medium">
+                Are you sure you want to delete <span className="font-bold text-gray-900">{deleteModal.name}</span>?
+              </p>
+              <p className="text-sm text-gray-500 mt-1">
+                {deleteModal.email}
+              </p>
+              <p className="text-xs text-red-500 mt-3 bg-red-50 rounded-lg px-3 py-2">
+                This action is permanent and cannot be undone.
+              </p>
+            </div>
+
+            {/* User preview card */}
+            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl mb-6">
+              <img src={deleteModal.picture || `https://ui-avatars.com/api/?name=${deleteModal.name}`}
+                   alt={deleteModal.name} className="w-10 h-10 rounded-full" />
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-gray-900 truncate">{deleteModal.name}</p>
+                <div className="flex gap-1 mt-0.5 flex-wrap">
+                  {deleteModal.roles?.map(r => (
+                    <span key={r} className={`px-1.5 py-0 rounded-full text-xs font-medium ${roleColor[r] || 'bg-gray-100 text-gray-700'}`}>{r}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeleteModal(null)}
+                disabled={deleting}
+                className="btn-secondary flex-1"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteUser}
+                disabled={deleting}
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+              >
+                <HiTrash className="text-sm" />
+                {deleting ? 'Deleting...' : 'Delete User'}
               </button>
             </div>
           </div>
