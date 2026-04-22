@@ -12,13 +12,37 @@ export default function RegisterPage() {
   const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' })
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [emailError, setEmailError] = useState('')
 
   useEffect(() => {
     if (user) navigate('/')
   }, [user, navigate])
 
+  // Validates email format: must contain @, a proper domain, and no uppercase letters
+  const validateEmail = (email) => {
+    if (!email.trim()) return 'Email address is required'
+    if (/[A-Z]/.test(email)) return 'Email must not contain uppercase letters'
+    const emailRegex = /^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$/
+    if (!emailRegex.test(email)) return 'Enter a valid email address (e.g. you@example.com)'
+    return ''
+  }
+
+  const handleEmailChange = (e) => {
+    const val = e.target.value
+    setForm({ ...form, email: val })
+    setEmailError(validateEmail(val))
+  }
+
   const handleRegister = async (e) => {
     e.preventDefault()
+
+    // Email validation
+    const emailErr = validateEmail(form.email)
+    if (emailErr) {
+      setEmailError(emailErr)
+      return
+    }
+
     if (form.password !== form.confirmPassword) {
       toast.error('Passwords do not match')
       return
@@ -34,7 +58,13 @@ export default function RegisterPage() {
       toast.success(`Welcome to NexusHub, ${data.name}!`)
       navigate('/')
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Registration failed')
+      const msg = err.response?.data?.message || 'Registration failed'
+      // Catch duplicate email errors returned by the backend
+      if (err.response?.status === 409 || msg.toLowerCase().includes('already') || msg.toLowerCase().includes('exists') || msg.toLowerCase().includes('duplicate')) {
+        setEmailError('This email is already registered. Try logging in instead.')
+      } else {
+        toast.error(msg)
+      }
     } finally {
       setLoading(false)
     }
@@ -96,13 +126,25 @@ export default function RegisterPage() {
             <div>
               <label className="block text-xs font-semibold text-slate-600 mb-1.5">Email Address</label>
               <div className="relative">
-                <HiMail className="absolute left-3.5 top-3.5 text-slate-400 text-sm" />
-                <input type="email" value={form.email}
-                       onChange={e => setForm({ ...form, email: e.target.value })}
-                       placeholder="you@sliit.lk"
-                       className="w-full pl-9 pr-4 py-3 rounded-xl border border-gray-200 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-400 transition-all"
-                       required />
+                <HiMail className={`absolute left-3.5 top-3.5 text-sm ${emailError ? 'text-red-400' : 'text-slate-400'}`} />
+                <input
+                  type="text"
+                  value={form.email}
+                  onChange={handleEmailChange}
+                  placeholder="you@sliit.lk"
+                  className={`w-full pl-9 pr-4 py-3 rounded-xl border text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 transition-all ${
+                    emailError
+                      ? 'border-red-300 focus:border-red-400 focus:ring-red-500/20'
+                      : 'border-gray-200 focus:border-teal-400 focus:ring-teal-500/20'
+                  }`}
+                  required
+                />
               </div>
+              {emailError && (
+                <p className="text-xs text-red-500 mt-1.5 flex items-center gap-1">
+                  <span>⚠</span> {emailError}
+                </p>
+              )}
             </div>
 
             <div>
