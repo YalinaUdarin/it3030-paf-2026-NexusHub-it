@@ -46,13 +46,18 @@ export default function ResourceCalendar({ resourceId }) {
   };
 
   const getDayStatus = (date) => {
+    // Past dates are not selectable
     if (isPast(date) && !isToday(date)) return 'past';
     const dayBookings = getBookingsForDay(date);
     if (dayBookings.length === 0) return 'available';
+
+    // If bookings exceed threshold → fully booked
+    // (Business rule: max 3 bookings per day)
     if (dayBookings.length >= 3) return 'full';
     return 'partial';
   };
 
+  // Generates the full calendar grid (weeks × days)
   const renderCalendarDays = () => {
     const monthStart = startOfMonth(currentMonth);
     const monthEnd = endOfMonth(currentMonth);
@@ -83,6 +88,7 @@ export default function ResourceCalendar({ resourceId }) {
         days.push(
           <div
             key={day.toString()}
+            // Prevent selecting past dates or days outside current month
             onClick={() =>
               status !== 'past' && isCurrentMonth && setSelectedDay(cloneDay)
             }
