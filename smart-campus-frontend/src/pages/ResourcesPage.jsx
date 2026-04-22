@@ -7,7 +7,7 @@ import {
   HiUsers, HiDesktopComputer, HiBeaker, HiChatAlt2, HiVideoCamera
 } from 'react-icons/hi'
 
-const TYPES = ['', 'LECTURE_HALL', 'LAB', 'MEETING_ROOM', 'EQUIPMENT']
+const TYPES = ['', 'LECTURE HALL', 'LAB', 'MEETING ROOM', 'EQUIPMENT']
 
 const typeConfig = {
   LECTURE_HALL: {
