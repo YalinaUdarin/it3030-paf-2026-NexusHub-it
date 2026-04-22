@@ -97,65 +97,118 @@ export default function NotificationsPage() {
   const unreadCount = notifications.filter(n => !n.read).length
 
   return (
-    <div className="max-w-2xl space-y-6">
+    <div className="max-w-2xl space-y-5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Notifications</h2>
-          <p className="text-gray-500 mt-1">{unreadCount} unread notification{unreadCount !== 1 ? 's' : ''}</p>
+          <div className="flex items-center gap-2 mb-0.5">
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center shadow-sm shadow-teal-500/20"
+                 style={{ background: 'linear-gradient(135deg, #0d9488, #0891b2)' }}>
+              <HiBell className="text-white text-sm" />
+            </div>
+            <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">Notifications</h2>
+          </div>
+          <p className="text-xs text-slate-400 ml-9">
+            {unreadCount > 0
+              ? <><span className="font-semibold text-teal-600">{unreadCount}</span> unread notification{unreadCount !== 1 ? 's' : ''}</>
+              : 'All caught up!'}
+          </p>
         </div>
-        <div className="flex gap-2">
-          <button onClick={() => setUnreadOnly(!unreadOnly)}
-                  className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${unreadOnly ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 border-gray-200'}`}>
+
+        <div className="flex items-center gap-2">
+          {/* Unread toggle */}
+          <button
+            onClick={() => setUnreadOnly(!unreadOnly)}
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+              unreadOnly
+                ? 'text-white border-transparent shadow-sm shadow-teal-500/20'
+                : 'bg-white text-slate-500 border-slate-200 hover:border-teal-300 hover:text-teal-600'
+            }`}
+            style={unreadOnly ? { background: 'linear-gradient(135deg, #0d9488, #0891b2)' } : {}}
+          >
             {unreadOnly ? 'Unread only' : 'All'}
           </button>
+
+          {/* Mark all read */}
           {unreadCount > 0 && (
-            <button onClick={handleMarkAll} className="btn-secondary flex items-center gap-1 text-sm">
-              <HiCheck /> Mark all read
+            <button
+              onClick={handleMarkAll}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white border border-slate-200 text-slate-600 hover:border-teal-300 hover:text-teal-600 transition-all"
+            >
+              <HiCheck className="text-sm" /> Mark all read
             </button>
           )}
-          <button onClick={() => setShowPreferences(!showPreferences)}
-                  className={`p-2 rounded-lg border transition-colors ${showPreferences ? 'bg-blue-50 border-blue-200 text-blue-600' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'}`}
-                  title="Notification Preferences">
-            <HiCog className="text-lg" />
+
+          {/* Preferences cog */}
+          <button
+            onClick={() => setShowPreferences(!showPreferences)}
+            title="Notification Preferences"
+            className={`p-2 rounded-xl border transition-all ${
+              showPreferences
+                ? 'text-white border-transparent shadow-sm shadow-teal-500/20'
+                : 'bg-white border-slate-200 text-slate-400 hover:border-teal-300 hover:text-teal-600'
+            }`}
+            style={showPreferences ? { background: 'linear-gradient(135deg, #0d9488, #0891b2)' } : {}}
+          >
+            <HiCog className="text-base" />
           </button>
         </div>
       </div>
 
       {/* Preferences Panel */}
       {showPreferences && preferences && (
-        <div className="card border-blue-200 bg-blue-50/30">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-              <HiCog className="text-blue-600" /> Notification Preferences
-            </h3>
-            <p className="text-xs text-gray-500">Toggle which notifications you receive</p>
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm shadow-slate-200/60 overflow-hidden">
+          {/* Panel header */}
+          <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between"
+               style={{ background: 'linear-gradient(135deg, #f0fdfa, #eff6ff)' }}>
+            <div className="flex items-center gap-2">
+              <HiCog className="text-teal-600 text-base" />
+              <p className="text-sm font-bold text-slate-800">Notification Preferences</p>
+            </div>
+            <p className="text-xs text-slate-400">Toggle what you receive</p>
           </div>
 
-          <div className="space-y-2">
+          <div className="p-4 space-y-2">
             {PREFERENCE_LABELS.map(({ key, label, icon, description }) => (
               <div key={key}
-                   className="flex items-center justify-between p-3 bg-white rounded-xl border border-gray-100 hover:border-blue-200 transition-colors">
+                   className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100 hover:border-teal-200 hover:bg-teal-50/30 transition-all">
                 <div className="flex items-center gap-3">
                   <span className="text-lg">{icon}</span>
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{label}</p>
-                    <p className="text-xs text-gray-400">{description}</p>
+                    <p className="text-sm font-semibold text-slate-800">{label}</p>
+                    <p className="text-xs text-slate-400">{description}</p>
                   </div>
                 </div>
+                {/* Toggle switch */}
                 <button
                   onClick={() => handlePreferenceToggle(key)}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${preferences[key] ? 'bg-blue-600' : 'bg-gray-200'}`}
+                  className={`relative inline-flex h-5 w-10 items-center rounded-full transition-colors focus:outline-none ${
+                    preferences[key] ? '' : 'bg-slate-200'
+                  }`}
+                  style={preferences[key] ? { background: 'linear-gradient(135deg, #0d9488, #0891b2)' } : {}}
                 >
-                  <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow ${preferences[key] ? 'translate-x-6' : 'translate-x-1'}`} />
+                  <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform shadow ${
+                    preferences[key] ? 'translate-x-5' : 'translate-x-1'
+                  }`} />
                 </button>
               </div>
             ))}
           </div>
 
-          <div className="flex gap-3 mt-4">
-            <button onClick={() => setShowPreferences(false)} className="btn-secondary flex-1">Cancel</button>
-            <button onClick={handleSavePreferences} disabled={savingPrefs} className="btn-primary flex-1">
+          <div className="flex gap-3 px-4 pb-4">
+            <button
+              onClick={() => setShowPreferences(false)}
+              className="flex-1 py-2.5 rounded-xl text-sm font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSavePreferences}
+              disabled={savingPrefs}
+              className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:-translate-y-0.5 shadow-md shadow-teal-500/20 disabled:opacity-60 disabled:cursor-not-allowed"
+              style={{ background: 'linear-gradient(135deg, #0d9488, #0891b2)' }}
+            >
               {savingPrefs ? 'Saving...' : 'Save Preferences'}
             </button>
           </div>
@@ -165,34 +218,56 @@ export default function NotificationsPage() {
       {/* Notifications list */}
       {loading ? (
         <div className="flex items-center justify-center h-48">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"/>
+          <div className="animate-spin rounded-full h-9 w-9 border-2 border-slate-100"
+               style={{ borderTopColor: '#0d9488' }} />
         </div>
       ) : notifications.length === 0 ? (
-        <div className="card text-center py-16">
-          <HiBell className="text-5xl text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500 font-medium">You're all caught up!</p>
-          <p className="text-gray-400 text-sm mt-1">No notifications to show</p>
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm text-center py-16">
+          <div className="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center"
+               style={{ background: 'linear-gradient(135deg, #f0fdfa, #eff6ff)' }}>
+            <HiBell className="text-2xl text-teal-400" />
+          </div>
+          <p className="font-semibold text-slate-700">You're all caught up!</p>
+          <p className="text-slate-400 text-sm mt-1">No notifications to show</p>
         </div>
       ) : (
         <div className="space-y-2">
           {notifications.map(n => (
-            <div key={n.id}
-                 className={`card flex items-start gap-4 cursor-pointer hover:shadow-md transition-all ${!n.read ? 'border-blue-200 bg-blue-50/30' : ''}`}
-                 onClick={() => handleClick(n)}>
-              <div className="text-2xl flex-shrink-0 mt-0.5">{typeIcons[n.type] || '🔔'}</div>
+            <div
+              key={n.id}
+              onClick={() => handleClick(n)}
+              className={`group flex items-start gap-4 p-4 rounded-2xl border cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-md ${
+                !n.read
+                  ? 'bg-teal-50/40 border-teal-200 shadow-sm shadow-teal-100'
+                  : 'bg-white border-slate-100 hover:border-slate-200'
+              }`}
+            >
+              {/* Icon */}
+              <div className="text-xl flex-shrink-0 mt-0.5">{typeIcons[n.type] || '🔔'}</div>
+
+              {/* Content */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2">
-                  <p className={`text-sm font-medium ${!n.read ? 'text-blue-900' : 'text-gray-900'}`}>{n.title}</p>
-                  {!n.read && <span className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-1.5" />}
+                  <p className={`text-sm font-semibold ${!n.read ? 'text-teal-900' : 'text-slate-800'}`}>
+                    {n.title}
+                  </p>
+                  {!n.read && (
+                    <span className="w-2 h-2 rounded-full flex-shrink-0 mt-1.5"
+                          style={{ background: 'linear-gradient(135deg, #0d9488, #0891b2)' }} />
+                  )}
                 </div>
-                <p className="text-sm text-gray-600 mt-0.5">{n.message}</p>
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{n.message}</p>
+                <p className="text-xs text-slate-400 mt-1.5">
                   {formatDistanceToNow(new Date(n.createdAt), { addSuffix: true })}
                 </p>
               </div>
-              <button onClick={e => { e.stopPropagation(); handleDelete(n.id) }}
-                      className="text-gray-300 hover:text-red-500 transition-colors flex-shrink-0">
-                <HiTrash />
+
+              {/* Delete */}
+              <button
+                onClick={e => { e.stopPropagation(); handleDelete(n.id) }}
+                className="text-slate-300 hover:text-red-400 transition-colors flex-shrink-0 opacity-0 group-hover:opacity-100"
+              >
+                <HiTrash className="text-base" />
               </button>
             </div>
           ))}
