@@ -18,6 +18,7 @@ export default function TicketsPage() {
   const [form, setForm] = useState({ title: '', description: '', category: 'IT_EQUIPMENT', priority: 'MEDIUM', location: '', contactPhone: '' })
   const [files, setFiles] = useState([])
   const [submitting, setSubmitting] = useState(false)
+  const [phoneError, setPhoneError] = useState('')
 
   useEffect(() => { fetchTickets() }, [filter])
 
@@ -29,9 +30,30 @@ export default function TicketsPage() {
     } finally { setLoading(false) }
   }
 
+  const validatePhone = (phone) => {
+    if (!phone) return true // optional field
+    // Accepts: +94771234567 | 0771234567 | +1-800-555-1234 | (077) 1234567 etc.
+    const phoneRegex = /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{3,4}[-\s.]?[0-9]{3,4}$/
+    return phoneRegex.test(phone.replace(/\s/g, ''))
+  }
+
+  const handlePhoneChange = (e) => {
+    const value = e.target.value
+    setForm({ ...form, contactPhone: value })
+    if (value && !validatePhone(value)) {
+      setPhoneError('Please enter a valid phone number (e.g. +94 77 123 4567)')
+    } else {
+      setPhoneError('')
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (files.length > 3) { toast.error('Max 3 attachments'); return }
+    if (form.contactPhone && !validatePhone(form.contactPhone)) {
+      setPhoneError('Please enter a valid phone number (e.g. +94 77 123 4567)')
+      return
+    }
     setSubmitting(true)
     try {
       const fd = new FormData()
@@ -41,6 +63,7 @@ export default function TicketsPage() {
       toast.success('Ticket submitted successfully!')
       setShowForm(false)
       setForm({ title: '', description: '', category: 'IT_EQUIPMENT', priority: 'MEDIUM', location: '', contactPhone: '' })
+      setPhoneError('')
       setFiles([])
       fetchTickets()
     } catch (err) {
@@ -109,8 +132,18 @@ export default function TicketsPage() {
               </div>
               <div>
                 <label className="label">Contact Phone</label>
-                <input value={form.contactPhone} onChange={e => setForm({...form, contactPhone: e.target.value})}
-                       placeholder="+94 77 000 0000" className="input" />
+                <input
+                  value={form.contactPhone}
+                  onChange={handlePhoneChange}
+                  placeholder="+94 77 000 0000"
+                  className={`input ${phoneError ? 'border-red-500 focus:ring-red-400' : ''}`}
+                  type="tel"
+                />
+                {phoneError && (
+                  <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                    <span>⚠</span> {phoneError}
+                  </p>
+                )}
               </div>
               <div>
                 <label className="label">Attachments (max 3 images)</label>
