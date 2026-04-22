@@ -38,6 +38,13 @@ export default function AdminResources() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    const loc = form.location.trim()
+    const hasBlock = /block\s*[a-zA-Z0-9]/i.test(loc)
+    const hasFloor = /floor\s*[0-9]/i.test(loc)
+    if (!hasBlock || !hasFloor) {
+      toast.error('Location must include a block (e.g. Block A) and a floor (e.g. Floor 2)')
+      return
+    }
     setSubmitting(true)
     try {
       if (modal === 'create') {
@@ -171,7 +178,14 @@ export default function AdminResources() {
               </div>
               <div>
                 <label className="label">Location *</label>
-                <input value={form.location} onChange={e => setForm({...form, location: e.target.value})} className="input" required placeholder="e.g. Block A, Floor 2" />
+                <input
+                  value={form.location}
+                  onChange={e => setForm({...form, location: e.target.value})}
+                  className="input"
+                  required
+                  placeholder="e.g. Block A, Floor 2"
+                />
+                <p className="text-xs text-slate-400 mt-1">Must include a block (e.g. Block A) and a floor (e.g. Floor 2)</p>
               </div>
               <div>
                 <label className="label">Description</label>
